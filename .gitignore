@@ -1,0 +1,21 @@
+# Environnement virtuel Python
+venv/
+env/
+ENV/
+.venv/
+
+# Fichiers compilés
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Fichiers système macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Configuration et secrets
+.env
+
+# Logs
+*.log

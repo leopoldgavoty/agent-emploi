@@ -2,7 +2,7 @@
 
 from typing import Dict, Any, List
 from database import JobDatabase
-from collectors import FranceTravailCollector, RSSJobCollector, LocalAnnecyCollector
+from collectors import FranceTravailCollector, RSSJobCollector, LocalAnnecyCollector, OSVCollector
 from config import EXCEL_PATH, CSV_PATH
 
 
@@ -10,9 +10,10 @@ class JobScoutEngine:
     def __init__(self, db: JobDatabase = None):
         self.db = db or JobDatabase()
         self.collectors = [
+            OSVCollector(),
+            LocalAnnecyCollector(),
             FranceTravailCollector(),
             RSSJobCollector(),
-            LocalAnnecyCollector(),
         ]
 
     def run_sync(self) -> Dict[str, Any]:

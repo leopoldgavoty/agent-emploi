@@ -88,13 +88,10 @@ ROME_CODES = [
 # Types de contrats prioritaires
 CONTRACT_TYPES = ["CDI", "CDD", "Freelance", "Alternance"]
 
-# Statuts de suivi des candidatures (Kanban)
+# Statuts de suivi des candidatures
 STATUS_OPTIONS = [
     "Nouvelle",
     "À postuler",
     "Candidature envoyée",
-    "Entretien planifié",
-    "Offre reçue",
-    "Refusé",
     "Archivé",
 ]

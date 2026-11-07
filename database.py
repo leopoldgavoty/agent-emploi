@@ -200,8 +200,14 @@ class JobDatabase:
             cursor.execute("SELECT COUNT(*) FROM jobs WHERE status = 'Nouvelle'")
             new_jobs = cursor.fetchone()[0]
 
-            cursor.execute("SELECT COUNT(*) FROM jobs WHERE status IN ('Candidature envoyée', 'Entretien planifié')")
-            active_applications = cursor.fetchone()[0]
+            cursor.execute("SELECT COUNT(*) FROM jobs WHERE status = 'À postuler'")
+            to_apply = cursor.fetchone()[0]
+
+            cursor.execute("SELECT COUNT(*) FROM jobs WHERE status = 'Candidature envoyée'")
+            applied = cursor.fetchone()[0]
+
+            cursor.execute("SELECT COUNT(*) FROM jobs WHERE status = 'Archivé'")
+            archived = cursor.fetchone()[0]
 
             cursor.execute("SELECT category, COUNT(*) FROM jobs GROUP BY category")
             by_category = dict(cursor.fetchall())
@@ -215,7 +221,10 @@ class JobDatabase:
             return {
                 "total": total_jobs,
                 "new": new_jobs,
-                "in_progress": active_applications,
+                "to_apply": to_apply,
+                "applied": applied,
+                "archived": archived,
+                "in_progress": to_apply + applied,
                 "by_category": by_category,
                 "by_status": by_status,
                 "by_contract": by_contract,

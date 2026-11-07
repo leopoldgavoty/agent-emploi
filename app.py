@@ -1,4 +1,4 @@
-"""Application Web Streamlit - Dashboard de Suivi des Offres Supply Chain à Annecy."""
+"""Application Web Streamlit - Outdoor Job Board 🦦"""
 
 import streamlit as st
 import pandas as pd
@@ -14,8 +14,8 @@ from engine import JobScoutEngine
 
 # Configuration de la page
 st.set_page_config(
-    page_title="Supply Chain Jobs Annecy | Agent de Veille",
-    page_icon="📦",
+    page_title="Outdoor Job Board 🦦",
+    page_icon="🦦",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -24,7 +24,6 @@ st.set_page_config(
 @st.cache_resource
 def get_db():
     db = JobDatabase()
-    # Initialisation au premier lancement si la base est vide
     stats = db.get_statistics()
     if stats["total"] == 0:
         engine = JobScoutEngine(db)
@@ -33,17 +32,9 @@ def get_db():
 
 db = get_db()
 
-# Custom CSS pour une interface soignée et moderne
+# Custom CSS pour une interface épurée et moderne
 st.markdown("""
 <style>
-    .metric-card {
-        background: #f8fafc;
-        border: 1px solid #e2e8f0;
-        border-radius: 12px;
-        padding: 16px;
-        text-align: center;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    }
     .job-card {
         background: white;
         border: 1px solid #e2e8f0;
@@ -53,8 +44,8 @@ st.markdown("""
         transition: all 0.2s ease;
     }
     .job-card:hover {
-        border-color: #3b82f6;
-        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.08);
+        border-color: #0284c7;
+        box-shadow: 0 4px 12px rgba(2, 132, 199, 0.08);
     }
     .tag {
         display: inline-block;
@@ -68,20 +59,19 @@ st.markdown("""
     .tag-loc { background: #e0f2fe; color: #0369a1; }
     .tag-cat { background: #f3e8ff; color: #6b21a8; }
     .tag-salary { background: #fef9c3; color: #854d0e; }
+    .tag-status-new { background: #f1f5f9; color: #475569; }
+    .tag-status-apply { background: #fef3c7; color: #b45309; }
+    .tag-status-sent { background: #dbeafe; color: #1d4ed8; }
+    .tag-status-archived { background: #f3f4f6; color: #6b7280; }
 </style>
 """, unsafe_allow_html=True)
 
-# Barre latérale : Synchronisation et Filtres
+# Barre latérale : Actions et Filtres
 with st.sidebar:
-    st.image("https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=400&q=80", use_container_width=True)
-    st.title("📦 Agent Supply Chain")
-    st.caption(f"📍 Bassin d'Annecy ({LOCATION['department']}) • Rayon {LOCATION['radius_km']} km")
-
-    st.markdown("---")
     st.subheader("⚡ Action Rapide")
 
     if st.button("🔄 Lancer la recherche maintenant", use_container_width=True, type="primary"):
-        with st.spinner("Interrogation des sources d'offres en cours..."):
+        with st.spinner("Recherche d'offres en cours sur le bassin d'Annecy..."):
             engine = JobScoutEngine(db)
             res = engine.run_sync()
             st.success(f"Synchronisation terminée ! {res['new_jobs_count']} nouvelle(s) offre(s) détectée(s).")
@@ -90,16 +80,14 @@ with st.sidebar:
     st.markdown("---")
     st.subheader("🔍 Filtres de Recherche")
 
-    search_query = st.text_input("Mots-clés (poste, entreprise, compétence)", placeholder="ex: Directeur, Salomon, ERP...")
+    search_query = st.text_input(
+        "Mots-clés (poste, entreprise, compétence)",
+        placeholder="ex: Salomon, Directeur, S&OP...",
+    )
 
     category_filter = st.selectbox(
         "Catégorie métier",
         ["Toutes"] + list(CATEGORIES.keys()) + ["Autre Supply Chain"],
-    )
-
-    status_filter = st.selectbox(
-        "Statut de candidature",
-        ["Tous"] + STATUS_OPTIONS,
     )
 
     contract_filter = st.selectbox(
@@ -110,13 +98,12 @@ with st.sidebar:
     st.markdown("---")
     st.subheader("📥 Export des données")
 
-    # Boutons d'export direct Excel / CSV
     if EXCEL_PATH.exists():
         with open(EXCEL_PATH, "rb") as f:
             st.download_button(
                 label="📊 Télécharger Excel (.xlsx)",
                 data=f.read(),
-                file_name=f"offres_supply_chain_annecy_{datetime.now().strftime('%Y%m%d')}.xlsx",
+                file_name=f"outdoor_jobs_annecy_{datetime.now().strftime('%Y%m%d')}.xlsx",
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 use_container_width=True,
             )
@@ -126,7 +113,7 @@ with st.sidebar:
             st.download_button(
                 label="📄 Télécharger CSV (.csv)",
                 data=f.read(),
-                file_name=f"offres_supply_chain_annecy_{datetime.now().strftime('%Y%m%d')}.csv",
+                file_name=f"outdoor_jobs_annecy_{datetime.now().strftime('%Y%m%d')}.csv",
                 mime="text/csv",
                 use_container_width=True,
             )
@@ -134,46 +121,64 @@ with st.sidebar:
 # En-tête principal & KPIs
 stats = db.get_statistics()
 
-st.title("🚀 Veille & Suivi des Offres Supply Chain — Annecy")
-st.markdown("Agent automatisé de détection, dédoublonnage et gestion des candidatures en Haute-Savoie.")
+st.title("Outdoor Job Board 🦦")
 
 col1, col2, col3, col4 = st.columns(4)
 with col1:
     st.metric("Total Offres Détectées", stats["total"])
 with col2:
-    st.metric("Nouvelles Offres", stats["new"], delta=f"{stats['new']} à traiter")
+    st.metric("Nouvelles Opportunités", stats["new"], delta=f"{stats['new']} à qualifier")
 with col3:
-    st.metric("Candidatures Actives", stats["in_progress"])
+    st.metric("À postuler", stats["to_apply"])
 with col4:
-    postes_cadres = stats["by_category"].get("Direction & Management", 0)
-    st.metric("Postes Cadres / Management", postes_cadres)
+    st.metric("Candidatures envoyées", stats["applied"])
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-# Onglets principaux
-tab1, tab2, tab3 = st.tabs(["📋 Liste des Opportunités", "📌 Suivi Kanban", "📈 Analyse du Marché"])
+# Les 3 onglets principaux
+tab1, tab2, tab3 = st.tabs(["🎯 Opportunités", "📌 Suivi Kanban", "🗄️ Archivées"])
 
-# Récupération des données filtrées
-jobs = db.get_all_jobs(
-    search=search_query,
-    category=category_filter,
-    status=status_filter,
-    contract=contract_filter,
-)
-
+# ----------------------------------------------------
+# ONGLET 1 : Opportunités (Nouvelles offres à qualifier)
+# ----------------------------------------------------
 with tab1:
-    st.subheader(f"Offres correspondantes ({len(jobs)})")
+    col_filter, col_info = st.columns([1, 2])
+    with col_filter:
+        status_filter_tab1 = st.selectbox(
+            "Filtrer par statut :",
+            ["Nouvelles uniquement", "Toutes", "À postuler", "Candidature envoyée", "Archivé"],
+            index=0,
+            key="tab1_status_filter",
+        )
 
-    if not jobs:
-        st.info("Aucune offre ne correspond à vos filtres actuels. Réinitialisez les filtres ou lancez une synchronisation.")
+    # Déterminer le statut à interroger
+    query_status = None
+    if status_filter_tab1 == "Nouvelles uniquement":
+        query_status = "Nouvelle"
+    elif status_filter_tab1 != "Toutes":
+        query_status = status_filter_tab1
+
+    jobs_tab1 = db.get_all_jobs(
+        search=search_query,
+        category=category_filter,
+        status=query_status,
+        contract=contract_filter,
+    )
+
+    with col_info:
+        st.write("")
+        st.caption(f"**{len(jobs_tab1)}** offre(s) affichée(s)")
+
+    if not jobs_tab1:
+        st.info("🎉 Aucune nouvelle offre en attente de traitement ! Cliquez sur '🔄 Lancer la recherche maintenant' pour scanner de nouveaux postes.")
     else:
-        for job in jobs:
+        for job in jobs_tab1:
             with st.container():
                 st.markdown(f"""
                 <div class="job-card">
                     <div style="display: flex; justify-content: space-between; align-items: start;">
                         <div>
-                            <h3 style="margin: 0 0 6px 0; color: #1e293b; font-size: 1.15rem;">
+                            <h3 style="margin: 0 0 6px 0; color: #0f172a; font-size: 1.15rem;">
                                 {job['title']}
                             </h3>
                             <p style="margin: 0 0 10px 0; color: #475569; font-weight: 500;">
@@ -195,80 +200,163 @@ with tab1:
                 </div>
                 """, unsafe_allow_html=True)
 
-                # Actions et changement de statut sous chaque carte
-                c_act1, c_act2, c_act3 = st.columns([2, 3, 2])
-                with c_act1:
+                # Barre d'actions sous chaque offre
+                c_stat, c_note, c_link = st.columns([2, 3, 2])
+                with c_stat:
+                    current_idx = STATUS_OPTIONS.index(job["status"]) if job["status"] in STATUS_OPTIONS else 0
                     new_st = st.selectbox(
-                        "Statut",
+                        "Attribuer un statut :",
                         STATUS_OPTIONS,
-                        index=STATUS_OPTIONS.index(job["status"]) if job["status"] in STATUS_OPTIONS else 0,
-                        key=f"status_{job['id']}",
+                        index=current_idx,
+                        key=f"tab1_stat_{job['id']}",
                     )
                     if new_st != job["status"]:
                         db.update_status(job["id"], new_st)
-                        st.toast(f"Statut mis à jour : {new_st}")
+                        st.toast(f"Offre déplacée vers : {new_st} !")
                         st.rerun()
 
-                with c_act2:
+                with c_note:
                     user_notes = st.text_input(
-                        "Notes personnelles",
+                        "Note personnelle :",
                         value=job.get("notes") or "",
-                        key=f"notes_{job['id']}",
-                        placeholder="ex: Envoyé CV version Cadre, relance le 12/11",
+                        key=f"tab1_note_{job['id']}",
+                        placeholder="ex: Contact RH Salomon, relance le 12/11...",
                     )
                     if user_notes != (job.get("notes") or ""):
                         db.update_status(job["id"], job["status"], notes=user_notes)
 
-                with c_act3:
+                with c_link:
                     st.write("")
                     st.write("")
                     if job.get("url"):
                         st.link_button("🔗 Consulter / Postuler", job["url"], use_container_width=True)
 
-                st.markdown("<hr style='margin: 10px 0 24px 0; border: none; border-top: 1px dashed #cbd5e1;'>", unsafe_allow_html=True)
+                st.markdown("<hr style='margin: 8px 0 20px 0; border: none; border-top: 1px dashed #cbd5e1;'>", unsafe_allow_html=True)
 
+# ----------------------------------------------------
+# ONGLET 2 : Suivi Kanban (À postuler & Candidature envoyée)
+# ----------------------------------------------------
 with tab2:
-    st.subheader("Tableau Kanban des Candidatures")
-    st.caption("Visualisez et organisez l'état d'avancement de vos démarches pour chaque entreprise d'Annecy.")
+    st.subheader("Pipeline des Candidatures")
+    st.caption("Suivez vos démarches actives en cours sur le bassin annécien.")
 
-    kanban_cols = ["Nouvelle", "À postuler", "Candidature envoyée", "Entretien planifié"]
-    k_cols = st.columns(len(kanban_cols))
+    col_k1, col_k2 = st.columns(2)
 
-    all_raw_jobs = db.get_all_jobs()
+    all_jobs = db.get_all_jobs(search=search_query, category=category_filter, contract=contract_filter)
+    to_apply_jobs = [j for j in all_jobs if j["status"] == "À postuler"]
+    applied_jobs = [j for j in all_jobs if j["status"] == "Candidature envoyée"]
 
-    for idx, col_name in enumerate(kanban_cols):
-        with k_cols[idx]:
-            col_jobs = [j for j in all_raw_jobs if j["status"] == col_name]
-            st.markdown(f"### {col_name} ({len(col_jobs)})")
-            for j in col_jobs:
-                with st.expander(f"**{j['title'][:32]}...**\n_{j['company']}_"):
-                    st.write(f"**Lieu :** {j['location']}")
-                    st.write(f"**Salaire :** {j['salary']}")
-                    if j.get("notes"):
-                        st.info(f"📝 {j['notes']}")
+    with col_k1:
+        st.markdown(f"### 🎯 À postuler ({len(to_apply_jobs)})")
+        if not to_apply_jobs:
+            st.info("Aucune offre marquée 'À postuler'. Définissez ce statut depuis l'onglet Opportunités.")
+        for j in to_apply_jobs:
+            with st.expander(f"**{j['title']}** — {j['company']}", expanded=True):
+                st.write(f"📍 **Lieu :** {j['location']} &nbsp;|&nbsp; 💰 **Salaire :** {j['salary']}")
+                if j.get("description"):
+                    st.caption(j["description"][:250] + "...")
+                
+                # Notes rapides
+                notes_val = st.text_input("Notes :", value=j.get("notes") or "", key=f"k_note_{j['id']}")
+                if notes_val != (j.get("notes") or ""):
+                    db.update_status(j["id"], j["status"], notes=notes_val)
+
+                # Changement de statut rapide
+                c_act1, c_act2, c_act3 = st.columns([1, 1, 1])
+                with c_act1:
+                    if st.button("✉️ Candidature envoyée", key=f"send_{j['id']}", use_container_width=True):
+                        db.update_status(j["id"], "Candidature envoyée")
+                        st.rerun()
+                with c_act2:
+                    if st.button("🗄️ Archiver", key=f"arch_k1_{j['id']}", use_container_width=True):
+                        db.update_status(j["id"], "Archivé")
+                        st.rerun()
+                with c_act3:
                     if j.get("url"):
-                        st.link_button("Lien offre", j["url"])
+                        st.link_button("Lien offre ↗", j["url"], use_container_width=True)
 
+    with col_k2:
+        st.markdown(f"### ✉️ Candidature envoyée ({len(applied_jobs)})")
+        if not applied_jobs:
+            st.info("Aucune candidature envoyée pour le moment.")
+        for j in applied_jobs:
+            with st.expander(f"**{j['title']}** — {j['company']}", expanded=True):
+                st.write(f"📍 **Lieu :** {j['location']} &nbsp;|&nbsp; 💰 **Salaire :** {j['salary']}")
+                if j.get("description"):
+                    st.caption(j["description"][:250] + "...")
+
+                # Notes rapides
+                notes_val = st.text_input("Notes de suivi :", value=j.get("notes") or "", key=f"k_app_note_{j['id']}")
+                if notes_val != (j.get("notes") or ""):
+                    db.update_status(j["id"], j["status"], notes=notes_val)
+
+                # Actions
+                c_act1, c_act2, c_act3 = st.columns([1, 1, 1])
+                with c_act1:
+                    if st.button("↩️ Revenir à postuler", key=f"back_{j['id']}", use_container_width=True):
+                        db.update_status(j["id"], "À postuler")
+                        st.rerun()
+                with c_act2:
+                    if st.button("🗄️ Archiver", key=f"arch_k2_{j['id']}", use_container_width=True):
+                        db.update_status(j["id"], "Archivé")
+                        st.rerun()
+                with c_act3:
+                    if j.get("url"):
+                        st.link_button("Lien offre ↗", j["url"], use_container_width=True)
+
+# ----------------------------------------------------
+# ONGLET 3 : Offres Archivées
+# ----------------------------------------------------
 with tab3:
-    st.subheader("Analyse du Bassin de l'Emploi Supply Chain - Annecy")
+    st.subheader("Offres Archivées")
+    st.caption("Consultez ou restaurez les offres d'emploi que vous avez écartées ou clôturées.")
 
-    col_g1, col_g2 = st.columns(2)
-    with col_g1:
-        st.markdown("#### Répartition par Catégorie de Poste")
-        if stats["by_category"]:
-            cat_df = pd.DataFrame(list(stats["by_category"].items()), columns=["Catégorie", "Nombre"])
-            st.bar_chart(cat_df.set_index("Catégorie"))
+    archived_jobs = db.get_all_jobs(
+        search=search_query,
+        category=category_filter,
+        status="Archivé",
+        contract=contract_filter,
+    )
 
-    with col_g2:
-        st.markdown("#### État du Pipeline de Candidatures")
-        if stats["by_status"]:
-            status_df = pd.DataFrame(list(stats["by_status"].items()), columns=["Statut", "Nombre"])
-            st.bar_chart(status_df.set_index("Statut"))
+    if not archived_jobs:
+        st.info("Aucune offre archivée pour l'instant.")
+    else:
+        for job in archived_jobs:
+            with st.container():
+                st.markdown(f"""
+                <div class="job-card" style="opacity: 0.85; background: #fafafa;">
+                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                        <div>
+                            <h3 style="margin: 0 0 6px 0; color: #475569; font-size: 1.1rem;">
+                                {job['title']}
+                            </h3>
+                            <p style="margin: 0 0 8px 0; color: #64748b; font-size: 0.9rem;">
+                                🏢 <b>{job['company']}</b> &nbsp;•&nbsp; 📍 {job['location']} &nbsp;•&nbsp; 📅 {job['published_date']}
+                            </p>
+                        </div>
+                        <div>
+                            <span class="tag tag-status-archived">Archivée</span>
+                        </div>
+                    </div>
+                    <p style="color: #64748b; font-size: 0.88rem; margin: 8px 0;">
+                        {job['description'][:200]}...
+                    </p>
+                </div>
+                """, unsafe_allow_html=True)
 
-    st.markdown("---")
-    st.markdown("""
-    #### 💡 Analyse du marché local (Grand Annecy & Haute-Savoie)
-    * **Forte demande de profils mixtes industrie / international** : Grâce aux grands comptes locaux (outdoor comme Salomon, décolletage et mécanique de précision dans la vallée, agroalimentaire et fabrication de mobilier haut de gamme).
-    * **Valorisation des outils modernes** : Les recruteurs recherchent particulièrement la maîtrise d'ERP majeurs (SAP, Microsoft Dynamics Business Central) et des pratiques S&OP / flux tirés Kanban.
-    * **Niveau de rémunération attractif** : Proximité suisse et dynamisme industriel conduisent à des packages salariaux généralement supérieurs de 10% à 20% à la moyenne nationale sur les postes Cadres / Management.
-    """)
+                c_rest1, c_rest2, c_rest3 = st.columns([1, 1, 2])
+                with c_rest1:
+                    if st.button("↩️ Restaurer dans Opportunités", key=f"rest_new_{job['id']}", use_container_width=True):
+                        db.update_status(job["id"], "Nouvelle")
+                        st.toast("Offre restaurée dans les Opportunités !")
+                        st.rerun()
+                with c_rest2:
+                    if st.button("🎯 Déplacer vers À postuler", key=f"rest_apply_{job['id']}", use_container_width=True):
+                        db.update_status(job["id"], "À postuler")
+                        st.toast("Offre déplacée vers 'À postuler' !")
+                        st.rerun()
+                with c_rest3:
+                    if job.get("url"):
+                        st.link_button("🔗 Voir l'offre originale", job["url"], use_container_width=True)
+
+                st.markdown("<hr style='margin: 8px 0 16px 0; border: none; border-top: 1px dashed #e2e8f0;'>", unsafe_allow_html=True)

@@ -22,7 +22,7 @@ def categorize_title(title: str) -> str:
     for category, keywords in CATEGORIES.items():
         if any(kw in title_lower for kw in keywords):
             return category
-    return "Autre Supply Chain"
+    return "Supply Chain & Opérations Outdoor"
 
 
 class JobDatabase:

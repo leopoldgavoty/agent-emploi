@@ -87,7 +87,7 @@ with st.sidebar:
 
     category_filter = st.selectbox(
         "Catégorie métier",
-        ["Toutes"] + list(CATEGORIES.keys()) + ["Autre Supply Chain"],
+        ["Toutes"] + list(CATEGORIES.keys()) + ["Supply Chain & Opérations Outdoor"],
     )
 
     contract_filter = st.selectbox(
@@ -229,7 +229,7 @@ with tab1:
                     st.write("")
                     st.write("")
                     if job.get("url"):
-                        st.link_button("🔗 Consulter / Postuler", job["url"], use_container_width=True)
+                        st.link_button("🔗 Voir l'offre (Accès libre)", job["url"], use_container_width=True)
 
                 st.markdown("<hr style='margin: 8px 0 20px 0; border: none; border-top: 1px dashed #cbd5e1;'>", unsafe_allow_html=True)
 

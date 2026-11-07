@@ -50,13 +50,22 @@ class FranceTravailCollector(BaseCollector):
         }
 
         jobs = []
-        keywords = ["supply chain", "responsable logistique", "approvisionneur", "gestionnaire des flux"]
+        keywords = [
+            "supply chain outdoor",
+            "demand planner",
+            "supply planner",
+            "approvisionneur",
+            "responsable logistique",
+            "adv outdoor",
+            "s&op",
+        ]
 
         for kw in keywords:
             params = {
                 "motsCles": kw,
                 "commune": LOCATION["insee_code"],
                 "distance": LOCATION["radius_km"],
+                "typeContrat": "CDI",
                 "range": "0-49",
             }
             try:

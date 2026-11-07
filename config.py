@@ -1,4 +1,4 @@
-"""Configuration globale de l'agent de recherche d'emploi Supply Chain - Annecy."""
+"""Configuration globale de l'agent Outdoor Job Board - Annecy."""
 
 import os
 from pathlib import Path
@@ -12,7 +12,7 @@ DB_PATH = DATA_DIR / "jobs.db"
 EXCEL_PATH = DATA_DIR / "offres_supply_chain_annecy.xlsx"
 CSV_PATH = DATA_DIR / "offres_supply_chain_annecy.csv"
 
-# Paramètres géographiques
+# Paramètres géographiques : Annecy et son écosystème outdoor
 LOCATION = {
     "city": "Annecy",
     "postal_code": "74000",
@@ -20,58 +20,104 @@ LOCATION = {
     "insee_code": "74010",
     "latitude": 45.8992,
     "longitude": 6.1294,
-    "radius_km": 25,  # Bassin du Grand Annecy et alentours (Rumilly, Epagny, Chavanod, Thônes, Argonay)
+    "radius_km": 30,  # Grand Annecy, Metz-Tessy, Epagny, Chavanod, Thônes, Rumilly
 }
 
-# Profils recherchés & Mots-clés
-KEYWORDS_GLOBAL = [
-    "supply chain",
-    "logistique",
-    "approvisionneur",
-    "approvisionnements",
-    "planificateur",
-    "ordonnancement",
-    "gestionnaire de stock",
-    "coordinateur flux",
-    "responsable supply chain",
-    "directeur supply chain",
+# Marques et entreprises phares de l'industrie outdoor ciblées
+OUTDOOR_BRANDS = [
+    "Salomon",
+    "Millet",
+    "WISE",
+    "Samaya",
+    "Arva",
+    "Cairn",
+    "Scott Sports",
+    "Décathlon",
+    "Arc'teryx",
+    "Amer Sports",
+    "Snowleader",
+    "Hardloop",
+    "Fusalp",
+    "TSL Outdoor",
+    "Baouw",
+    "In&motion",
+    "Outdoor Sports Valley",
+    "Eider",
+    "Picture Organic",
 ]
 
-# Classification des profils
+# Mots-clés de veille (Supply Chain, Planning, Opérations, ADV, Service Client)
+KEYWORDS_GLOBAL = [
+    "supply chain",
+    "demand planning",
+    "supply planning",
+    "distribution planning",
+    "s&op",
+    "planificateur",
+    "approvisionneur",
+    "approvisionnement",
+    "logistique",
+    "operations",
+    "opérations",
+    "service client",
+    "customer service",
+    "adv",
+    "administration des ventes",
+    "gestionnaire de stock",
+    "ordonnancement",
+    "outdoor",
+]
+
+# Classification des métiers Supply Chain & Opérations Outdoor
 CATEGORIES = {
-    "Direction & Management": [
+    "Demand & Supply Planning / S&OP": [
+        "demand planning",
+        "supply planning",
+        "distribution planning",
+        "s&op",
+        "planificateur",
+        "demand planner",
+        "supply planner",
+        "planification",
+        "forecasting",
+        "prévisions",
+        "ordonnancement",
+    ],
+    "Direction & Management Opérations": [
         "directeur supply chain",
         "responsable supply chain",
         "supply chain manager",
+        "head of operations",
+        "directeur des opérations",
+        "responsable opérations",
         "directeur logistique",
         "responsable logistique",
-        "responsable des flux",
-        "responsable approvisionnement",
-        "head of supply chain",
+        "operations manager",
     ],
-    "Planification & Approvisionnements": [
-        "planificateur",
+    "Approvisionnements & Achats": [
         "approvisionneur",
         "gestionnaire approvisionnement",
-        "chargé d'ordonnancement",
-        "planificateur de production",
-        "demand planner",
-        "supply planner",
+        "chargé d'approvisionnement",
+        "acheteur supply",
+        "sourcing",
+        "acheteur outdoor",
     ],
-    "Opérations & Flux": [
-        "coordinateur supply chain",
+    "Logistique & Distribution": [
         "gestionnaire de stock",
         "coordinateur logistique",
-        "gestionnaire adv",
-        "administration des ventes",
+        "responsable entrepôt",
         "affréteur",
-        "superviseur logistique",
+        "distribution",
+        "flux physiques",
     ],
-    "Achats & Ingénierie": [
-        "acheteur supply chain",
-        "ingénieur supply chain",
-        "consultant supply chain",
-        "chef de projet logistique",
+    "Service Client & ADV (Customer Operations)": [
+        "service client",
+        "customer service",
+        "adv",
+        "administration des ventes",
+        "customer care",
+        "chargé de clientèle",
+        "order to cash",
     ],
 }
 
@@ -85,10 +131,10 @@ ROME_CODES = [
     "M1102",  # Direction des achats
 ]
 
-# Types de contrats prioritaires
-CONTRACT_TYPES = ["CDI", "CDD", "Freelance", "Alternance"]
+# Type de contrat : CDI UNIQUEMENT selon vos critères
+CONTRACT_TYPES = ["CDI"]
 
-# Statuts de suivi des candidatures
+# Statuts de qualification et suivi
 STATUS_OPTIONS = [
     "Nouvelle",
     "À postuler",
